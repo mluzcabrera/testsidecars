@@ -5,8 +5,9 @@ on:
  workflow_dispatch:
 jobs:
   build:
-    service:
-    asdfaf:
+    services:
+      myservice:
+        image: awrong image
     steps:
       # Wait for Redis to be ready
       - name: Wait for Redis service to be healthy

@@ -1,0 +1,24 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: sidecar test 2
+on:
+ workflow_dispatch:
+jobs:
+  build:
+    service:
+    asdfaf:
+    steps:
+      # Wait for Redis to be ready
+      - name: Wait for Redis service to be healthy
+        uses: docker://redis:7-alpine3.20
+        run: |
+          until redis-cli -h localhost -p 6379 ping | grep PONG; do
+            echo "Waiting for Redis...";
+            sleep 5;
+          done
+      # Connecting to Redis and executing commands
+      - name: Run Redis commands
+        uses: docker://redis:7-alpine3.20
+        run: |
+          redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
+          redis-cli -h localhost -p 6379 GET testkey

@@ -8,13 +8,7 @@ jobs:
     services:
       server:
         image: docker:18.05-dind
-        healthcheck:
-          cmd: | 
-            until redis-cli -h localhost -p 6379 ping | grep PONG; do
-              echo "Waiting for Redis...";
-              sleep 5;
-            done
-          timeout-seconds: 60
+        
     steps:
 
       - name: Run Redis commands

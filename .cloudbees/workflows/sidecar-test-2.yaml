@@ -8,16 +8,19 @@ jobs:
     services:
       redis:
         image: docker://redis:7-alpine3.20
+        healthcheck: 
+          cmd: redis-cli ping
+          timeout-seconds: 60
 
     steps:
       # Wait for Redis to be ready
-      - name: Wait for Redis service to be healthy
-        uses: docker://redis:7-alpine3.20
-        run: |
-          until redis-cli -h localhost -p 6379 ping | grep PONG; do
-            echo "Waiting for Redis...";
-            sleep 5;
-          done
+      # - name: Wait for Redis service to be healthy
+        # uses: docker://redis:7-alpine3.20
+        # run: |
+          # until redis-cli -h localhost -p 6379 ping | grep PONG; do
+            # echo "Waiting for Redis...";
+            # sleep 5;
+          # done
 
       # Connecting to Redis and executing commands
       - name: Run Redis commands

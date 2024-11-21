@@ -9,7 +9,7 @@ jobs:
       redis:
         image: docker://redis:7-alpine3.20
         healthcheck: 
-          cmd: redis-cli pingggg
+          cmd: rediadfawdfs-cli pingggg
           timeout-seconds: 1
 
     steps:

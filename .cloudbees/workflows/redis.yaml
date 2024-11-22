@@ -13,9 +13,9 @@ jobs:
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20
         run: |
-          until redis-cli -h localhost -p 6379 ping | grep PONG; do
+          until redis-cli ping | grep PONG; do
             echo "Waiting for Redis...";
             sleep 5;
           done
-          redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
-          redis-cli -h localhost -p 6379 GET testkey
+          redis-cli SET testkey "Hello Redis!"
+          redis-cli GET testkey

@@ -7,16 +7,7 @@ on:
 
 jobs:
   generate:
-    services:
-      postgres:
-        image: docker://postgres:13
-        env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb
-        healthcheck:
-          cmd: pg_isready -U testuser -d testdb
-          timeout-seconds: 7
+
     steps:
       - uses: docker://postgres:13
         name: Say hello

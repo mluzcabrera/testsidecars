@@ -1,25 +1,12 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: postgress
-env:
-  WORKFLOW_ENV_VAR: "value from workflow env var, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}"
-  WORKFLOW_ENV_VAR_ONCE: "value from workflow env var, secretUsedOnceWorkflow: ${{secrets.secretUsedOnceWorkflow}}"
-permissions:
-  scm-token-own: read
-  scm-token-org: none
-  id-token: none
+
 on:
   workflow_dispatch:
 
 jobs:
   generate:
-    environment: DEV
-    outputs:
-      hashsum: ${{ steps.hasher.outputs.hashsum }}
-    env:
-      JOB_ENV_VAR: value from job env var ${{vars.prop1}} ${{secrets.secret1}} ${{secrets.job-secret}}
-      JOB_ENV_VAR_ONCE: "value from job env var, secretUsedOnceJob: ${{secrets.secretUsedOnceJob}}"
-    timeout-minutes: 2
     services:
       postgres:
         image: docker://postgres:13

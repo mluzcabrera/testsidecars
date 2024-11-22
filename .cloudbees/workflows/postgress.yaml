@@ -7,10 +7,21 @@ on:
 
 jobs:
   generate:
-
+    services:
+      postgres:
+        image: docker://postgres:13
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        healthcheck:
+          cmd: pg_isready -U testuser -d testdb
+          timeout-seconds: 7
     steps:
       - uses: docker://postgres:13
         name: Say hello
         shell: sh
         run: |
-          pg_isready -U testuser -d testdb
+          pg_isready -U testuser -d testdb -h localhost -p 5432

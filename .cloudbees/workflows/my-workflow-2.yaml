@@ -6,17 +6,7 @@ on:
 jobs:
   call_rw_init:
     steps:
-      - name: Set up
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world"
       - name: Init
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world"
-      - name: Finalize
         uses: docker://golang:1.20.3-alpine3.17
         shell: sh
         run: |
@@ -38,21 +28,12 @@ jobs:
         shell: sh
         run: |
           echo "hello world"
+    needs: call_rw_init
   call_rw_finalizacion:
     steps:
-      - name: Set up
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world"
       - name: Finalization
         uses: docker://golang:1.20.3-alpine3.17
         shell: sh
         run: |
           echo "hello world"
-      - name: Finalize
-        uses: docker://golang:1.20.3-alpine3.17
-        shell: sh
-        run: |
-          echo "hello world"
-      
+    needs: call_rw_2_init

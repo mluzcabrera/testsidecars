@@ -24,4 +24,4 @@ jobs:
         name: Say hello
         shell: sh
         run: |
-          pg_isready -U testuser -d testdb -h localhost -p 5432
+          pg_isready -U testuser -d testdb -h localhost -p 5433

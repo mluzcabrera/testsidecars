@@ -14,7 +14,7 @@ jobs:
         image: docker://redis:7-alpine3.20
         healthcheck:
           cmd: awrongcommand
-          timeout-seconds: 1
+          timeout-seconds: 120
     steps:
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20

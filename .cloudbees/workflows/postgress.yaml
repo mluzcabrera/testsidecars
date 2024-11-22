@@ -24,6 +24,10 @@ jobs:
       postgres:
         image: docker://postgres:13
         env:
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: localhost
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
@@ -38,8 +42,8 @@ jobs:
           const { Client } = require('pg');
 
           const pgclient = new Client({
-              host: process.env.POSTGRES_HOST,
-              port: process.env.POSTGRES_PORT,
+              host: localhost,
+              port: 5432,
               user: 'postgres',
               password: 'postgres',
               database: 'postgres'

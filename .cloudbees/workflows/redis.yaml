@@ -1,18 +1,12 @@
-
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: redis
-
 on:
-  push:
-    branches:
-    - '**'
-
+  workflow_dispatch:
 permissions:
   scm-token-own: read
   scm-token-org: read
   id-token: write
-
 jobs:
   build:
     if: ${{ vars.workflow_execution_env == 'staging' }}
@@ -20,11 +14,9 @@ jobs:
       redis:
         image: docker://redis:7-alpine3.20
         healthcheck:
-          cmd: "redis-cli ping"
+          cmd: redis-cli ping
           timeout-seconds: 5
-
     steps:
-      # Wait for Redis to be ready
       - name: Wait for Redis service to be healthy
         uses: docker://redis:7-alpine3.20
         run: |
@@ -32,11 +24,8 @@ jobs:
             echo "Waiting for Redis...";
             sleep 5;
           done
-
-      # Connecting to Redis and executing commands
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20
         run: |
           redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
           redis-cli -h localhost -p 6379 GET testkey
-

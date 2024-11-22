@@ -1,32 +1,25 @@
-
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: postgress
-
 env:
   WORKFLOW_ENV_VAR: "value from workflow env var, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}"
   WORKFLOW_ENV_VAR_ONCE: "value from workflow env var, secretUsedOnceWorkflow: ${{secrets.secretUsedOnceWorkflow}}"
-
 permissions:
   scm-token-own: read
   scm-token-org: none
   id-token: none
+on:
+  workflow_dispatch:
 
 jobs:
   generate:
     environment: DEV
-    # generate job
-    # ├── hello docker/container step
-    # ├── digester action
-    # |   └── generator action
-    # └── asserting docker/container step
     outputs:
       hashsum: ${{ steps.hasher.outputs.hashsum }}
     env:
-      JOB_ENV_VAR: "value from job env var ${{vars.prop1}} ${{secrets.secret1}} ${{secrets.job-secret}}"
+      JOB_ENV_VAR: value from job env var ${{vars.prop1}} ${{secrets.secret1}} ${{secrets.job-secret}}
       JOB_ENV_VAR_ONCE: "value from job env var, secretUsedOnceJob: ${{secrets.secretUsedOnceJob}}"
     timeout-minutes: 2
-    if: ${{ env.JOB_ENV_VAR != '' }}
     services:
       postgres:
         image: docker://postgres:13
@@ -37,7 +30,6 @@ jobs:
         healthcheck:
           cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7
-
     steps:
       - uses: docker://rancher/cowsay
         working-directory: ../
@@ -53,9 +45,9 @@ jobs:
           prefix: generated-file-prefix-
           assertenv: true
         env:
-          ACTION_ENV_VAR1: "value from action env var ${{vars.propUsedOnce}}"
-          ACTION_ENV_VAR2: "action env var value 2"
-          ACTION_ENV_SECRET1: "value from action env secret ${{secrets.secretUsedOnceStep}}"
+          ACTION_ENV_VAR1: value from action env var ${{vars.propUsedOnce}}
+          ACTION_ENV_VAR2: action env var value 2
+          ACTION_ENV_SECRET1: value from action env secret ${{secrets.secretUsedOnceStep}}
         kind: scan
       - uses: docker://alpine:3.17
         kind: test
@@ -86,8 +78,7 @@ jobs:
         uses: fake-preconfigured-action
         with:
           input1: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          # additional inputs are defined by the pre-configured Action.
-          input6: "workflow-author-defined"
+          input6: workflow-author-defined
       - uses: docker://alpine:3.17
         kind: test
         run: |
@@ -98,261 +89,4 @@ jobs:
           [ '${{steps.preconfigured.outputs.output4}}' = 'preconf protected secret input 4' ]
           [ '${{steps.preconfigured.outputs.output5}}' = 'preconf input 5 with secret as default: secretValue1 fake-commit-sha' ]
           [ '${{steps.preconfigured.outputs.output6}}' = 'workflow-author-defined' ]
-
-  consume-job-output:
-    permissions:
-      scm-token-own: read
-      scm-token-org: read
-      id-token: write
-    needs:
-      - generate
-    if: ${{needs.generate.outputs.hashsum != ''}}
-    steps:
-      - uses: docker://alpine:3.17
-        run: 'echo "hashsum: ${{ needs.generate.outputs.hashsum }}"'
-        kind: test
-
-  jsongen:
-    outputs:
-      jsonout: ${{ steps.jsongen.outputs.jsonout }}
-    steps:
-      - id: jsongen
-        uses: docker://alpine:3.20
-        run: |
-          echo '{"hello": "from job"}' > $CLOUDBEES_OUTPUTS/jsonout
-  evaluate-functions:
-    needs: jsongen
-    steps:
-      - uses: docker://alpine:3.20
-        run: |
-          echo hello ${{ fromJSON(needs.jsongen.outputs.jsonout)['hello'] }}
-      - id: jsongen
-        uses: docker://alpine:3.20
-        run: |
-          echo '{"hello": "world"}' > $CLOUDBEES_OUTPUTS/jsonout
-      - uses: docker://alpine:3.20
-        run: |
-          echo hello ${{ fromJSON(steps.jsongen.outputs.jsonout)['hello'] }}
-
-  helloworld:
-    if: ${{ true }}
-    outputs:
-      envvar: ${{ env.WORKFLOW_ENV_VAR }}
-    needs: consume-job-output
-    steps:
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ true || secrets.secret1 == 'secretValue1' }}
-        run: |
-          echo hello world, $MYPROP $MYSECRET
-          [ "${JOB_ENV_VAR:-undefined}" = undefined ]
-          echo shared-tmp-content > $RUNNER_TEMP/tmp-file
-          echo "JOB_ID: ${JOB_ID}"
-          echo "STEP_ID: ${STEP_ID}"
-          echo "cloudbees scm context: ${{ cloudbees.scm.sha }}"
-          echo "cloudbees version: ${VERSION}"
-        env:
-          MYVAR: "prop: ${{vars['prop1']}}"
-          MYSECRET: "secret: ${{secrets.secret1}}"
-          JOB_ID: "${{job.id}}"
-          STEP_ID: "${{step.id}}"
-          VERSION: "${{ cloudbees.version }}"
-        timeout-minutes: 1
-      - id: shortid
-        uses: docker://alpine:3.17
-        run: |
-          set -x
-          [ "$(cat "$RUNNER_TEMP/tmp-file")" = shared-tmp-content ]
-      - id: typed
-        uses: ./typed
-        if: "true"
-        with:
-          number: 4
-          boolean: true
-          string: "4"
-        kind: scan
-      - id: if-false
-        if: "false"
-        uses: ./typed
-
-  filesystem-permissions:
-    # Verify containers with different UIDs can share data within workspace
-    steps:
-      - uses: docker://alpine:3.18
-        run: |
-          id
-          ls -la .
-          echo Writing file as root user
-          mkdir testdir
-          touch testdir/somefile.yaml
-          ls -la testdir
-      - uses: docker://mikefarah/yq:4.34.1 # defines UID 1000
-        run: |
-          set -ux
-          id
-          ls -la testdir
-          echo Writing same file as UID 1000
-          yq -i '.someProperty = "some value"' testdir/somefile.yaml
-          [ "$(cat testdir/somefile.yaml)" = 'someProperty: some value' ]
-
-  ifjoblevel:
-    if: ${{ vars.falseProp }}
-    steps:
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ true }}
-        run: |
-          echo "should not be run"
-        env:
-          MYSECRET: "secret: ${{secrets.secret1}}"
-      - id: hashertrue
-        if: ${{ vars.trueProp }}
-        uses: ./digester
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-        kind: scan
-      - id: hasherfalse
-        if: ${{ vars.falseProp }}
-        uses: ./digester
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-        kind: scan
-  ifsteplevel:
-    if: ${{ vars.trueProp }}
-    steps:
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ vars.trueProp }}
-        run: |
-          echo "should be run: ${{ vars.trueProp }}"
-        timeout-minutes: 1
-      - uses: docker://alpine:3.17
-        kind: build
-        if: vars.trueProp
-        run: |
-          echo "should be run, no expression"
-        timeout-minutes: 1
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ vars.falseProp }}
-        run: |
-          echo "should not be run"
-        timeout-minutes: 1
-  ifaction:
-    if: ${{ vars.trueProp }}
-    steps:
-      - id: hashertrue
-        if: ${{ vars.trueProp }}
-        uses: ./digester
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-        kind: scan
-      - id: hasherfalse
-        if: ${{ vars.falseProp }}
-        uses: ./digester
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-        kind: scan
-      - name: Use evaluated input as step-level if condition within Action
-        uses: ./digester
-        with:
-          salt: fake salt
-          prefix: myprefix-
-          run-conditional-step: ${{ vars.falseProp }}
-
-  continueonerror:
-    if: ${{ vars.trueProp }}
-    steps:
-      - uses: docker://alpine:3.17
-        kind: build
-        continue-on-error: true
-        if: ${{ vars.trueProp }}
-        run: |
-          invalid-command
-        timeout-minutes: 1
-      - uses: docker://alpine:3.17
-        kind: build
-        if: vars.trueProp
-        run: |
-          echo "should be run"
-        timeout-minutes: 1
-      - id: actionrun
-        if: ${{ vars.trueProp }}
-        continue-on-error: true
-        uses: ./digester
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-        kind: scan
-      - uses: docker://alpine:3.17
-        kind: build
-        continue-on-error: false
-        if: ${{ vars.trueProp }}
-        run: |
-          invalid-command
-        timeout-minutes: 1
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ vars.trueProp }}
-        run: |
-          echo "should not be run"
-        timeout-minutes: 1
-      - id: actionskipped
-        if: ${{ vars.trueProp }}
-        uses: ./digester
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-        kind: scan
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ vars.falseProp }}
-        run: |
-          echo "should not be run"
-      - uses: docker://alpine:3.17
-        kind: build
-        if: ${{ always() }}
-        run: |
-          echo "should be run"
-        timeout-minutes: 1
-
-  Weird_JobId: # special characters in names
-    outputs:
-      weird_Output: ${{ steps.step1.outputs.weird_stepOutput }}
-    steps:
-      - id: step1
-        uses: docker://alpine:3.18
-        run: |
-          set -eu
-          echo hello > $CLOUDBEES_OUTPUTS/weird_stepOutput
-        kind: build
-
-  action-with-custom-image:
-    steps:
-      - uses: ./action-with-custom-image
-
-  custom-job:
-    delegates: ./customjobs/custom-job.yml
-    with:
-      customjob_input1: provided job input1
-
-  prod-deploy:
-    environment: PROD # requires manual approval
-    steps:
-      - uses: docker://alpine:3.18
-        run: |
-          echo fake deployment after manual approval ${{vars.common_global_env_prop}} ${{vars.common_global_env_prop_override}} ${{vars.env_only_int_prop}}
-          echo fake deployment after manual approval ${{secrets.common_global_env_secret}} ${{secrets.env_only_secret_prop}} ${{secrets.common_global_env_secret_override}}
-
-  prod-deploy-2:
-    needs: prod-deploy
-    environment: PROD # requires manual approval
-    steps:
-      - uses: docker://alpine:3.18
-        run: |
-          echo fake deployment after manual approval ${{vars.common_global_env_prop}} ${{vars.common_global_env_prop_override}} ${{vars.env_only_int_prop}}
-          echo fake deployment after manual approval ${{secrets.common_global_env_secret}} ${{secrets.env_only_secret_prop}} ${{secrets.common_global_env_secret_override}}
+  

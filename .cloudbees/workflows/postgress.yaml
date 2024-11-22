@@ -31,62 +31,36 @@ jobs:
           cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7
     steps:
-      - uses: docker://rancher/cowsay
-        working-directory: ../
-        with:
-          entrypoint: /usr/local/bin/cowsay
-          args: '"hello world" ${{vars.prop1}} ${{secrets.secret1}} ${{env.WORKFLOW_ENV_VAR}} ${{job.id}} ${{cloudbees.version}}'
-        kind: build
-      - id: hasher
-        uses: ./digester
-        if: ${{ true || secrets.secret_for_action_step == 'secretActionValue' }}
-        with:
-          salt: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          prefix: generated-file-prefix-
-          assertenv: true
-        env:
-          ACTION_ENV_VAR1: value from action env var ${{vars.propUsedOnce}}
-          ACTION_ENV_VAR2: action env var value 2
-          ACTION_ENV_SECRET1: value from action env secret ${{secrets.secretUsedOnceStep}}
-        kind: scan
-      - uses: docker://alpine:3.17
-        kind: test
+      - uses: docker://postgres:13
+        name: Say hello
+        shell: sh
         run: |
-          set -eux
-          pwd
-          echo "$WORKFLOW_ENV_VAR"
-          echo "$JOB_ENV_VAR"
-          echo job_id: ${{job.id}}
-          echo step_id: ${{step.id}}
-          echo hashsum: ${{steps.hasher.outputs.hashsum}}
-          [ "$SALT" = 'some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}' ]
-          HASHSUM_PREFIX=$(echo "$HASHSUM" | sed -E 's/^(.{7}).*/\1/')
-          [ "$HASHSUM_PREFIX" = c7d0c36 ]
-          [ "${{cloudbees.scm.token}}" = fake-scm-token ]
-          [ "${{cloudbees.api.token}}" = 'fake-api-token[claims:environment=DEV,job_id=generate,run_attempt=1,run_id=fake-run-id,run_number=10,workflow=complex,workflow_ref=fake-org/fake-repo/.cloudbees/workflows/max-specificity.yaml@refs/heads/fake-branch;perms:id-token=none,scm-token-org=none,scm-token-own=read]' ]
-          [ "${{cloudbees.version}}" = 1.0.0 ]
-          echo "Cloudbees API token: ${{cloudbees.api.token}}"
-          echo "Cloudbees SCM token: ${{cloudbees.scm.token}}"
-          set +x
-          printf "STEP CONTEXT:\n%s" "$STEPCONTEXTDUMP"
-        env:
-          HASHSUM: ${{steps.hasher.outputs.hashsum}}
-          SALT: ${{steps.hasher.outputs.salt}}
-          STEPCONTEXTDUMP: ${{toJSON(steps)}}
-        working-directory: /cloudbees
-      - id: preconfigured
-        uses: fake-preconfigured-action
-        with:
-          input1: "some fake value ${{cloudbees.event.sampleKey}}, prop1: ${{vars.prop1}}, secret1: ${{secrets.secret1}}, env: ${{env.WORKFLOW_ENV_VAR}} jobID: ${{job.id}}"
-          input6: workflow-author-defined
-      - uses: docker://alpine:3.17
-        kind: test
-        run: |
-          set -eux
-          [ '${{steps.preconfigured.outputs.output1}}' = 'some fake value myvalue, prop1: propValue1, secret1: secretValue1, env: value from workflow env var, prop1: propValue1, secret1: secretValue1 jobID: generate' ]
-          [ '${{steps.preconfigured.outputs.output2}}' = 'preconf secret input 2' ]
-          [ '${{steps.preconfigured.outputs.output3}}' = 'preconf protected input: secretValue1 fake-commit-sha' ]
-          [ '${{steps.preconfigured.outputs.output4}}' = 'preconf protected secret input 4' ]
-          [ '${{steps.preconfigured.outputs.output5}}' = 'preconf input 5 with secret as default: secretValue1 fake-commit-sha' ]
-          [ '${{steps.preconfigured.outputs.output6}}' = 'workflow-author-defined' ]
-  
+          const { Client } = require('pg');
+
+          const pgclient = new Client({
+              host: process.env.POSTGRES_HOST,
+              port: process.env.POSTGRES_PORT,
+              user: 'postgres',
+              password: 'postgres',
+              database: 'postgres'
+          });
+
+          pgclient.connect();
+
+          const table = 'CREATE TABLE student(id SERIAL PRIMARY KEY, firstName VARCHAR(40) NOT NULL, lastName VARCHAR(40) NOT NULL, age INT, address VARCHAR(80), email VARCHAR(40))'
+          const text = 'INSERT INTO student(firstname, lastname, age, address, email) VALUES($1, $2, $3, $4, $5) RETURNING *'
+          const values = ['Mona the', 'Octocat', 9, '88 Colin P Kelly Jr St, San Francisco, CA 94107, United States', 'octocat@github.com']
+
+          pgclient.query(table, (err, res) => {
+              if (err) throw err
+          });
+
+          pgclient.query(text, values, (err, res) => {
+              if (err) throw err
+          });
+
+          pgclient.query('SELECT * FROM student', (err, res) => {
+              if (err) throw err
+              console.log(err, res.rows) // Print the data in student table
+              pgclient.end()
+          });

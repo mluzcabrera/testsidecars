@@ -19,11 +19,6 @@ jobs:
         entrypoint: "docker-entrypoint.sh"
         args: ["postgres"]
     steps:
-      - uses: docker://postgres:13
-        name: Test 1
-        shell: sh
-        run: |
-          pg_isready -U testuser -d testdb
       - name: Run tests against postgres db
         uses: docker://postgres:13
         env:

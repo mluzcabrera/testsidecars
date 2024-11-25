@@ -9,6 +9,12 @@ permissions:
   id-token: write
 jobs:
   build:
+    services:
+      redis:
+        image: docker://redis:7-alpine3.20
+        healthcheck:
+          cmd: "redis-cli ping"
+          timeout-seconds: 50
     steps:
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20

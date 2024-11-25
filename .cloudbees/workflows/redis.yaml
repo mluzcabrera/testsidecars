@@ -14,7 +14,7 @@ jobs:
         image: docker://redis:7-alpine3.20
         healthcheck:
           cmd: "redis-cli ping"
-          timeout-seconds: 50
+          timeout-seconds: 1
     steps:
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20

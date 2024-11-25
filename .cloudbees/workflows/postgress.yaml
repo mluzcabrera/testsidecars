@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    if: ${{ vars.workflow_execution_env == 'staging' }}
     services:
       postgres:
         image: docker://postgres:13

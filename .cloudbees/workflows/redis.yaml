@@ -3,10 +3,6 @@ kind: workflow
 name: redis
 on:
   workflow_dispatch:
-permissions:
-  scm-token-own: read
-  scm-token-org: read
-  id-token: write
 jobs:
   build:
     services:
@@ -14,7 +10,7 @@ jobs:
         image: docker://redis:7-alpine3.20
         healthcheck:
           cmd: "redis-cli ping"
-          timeout-seconds: 1
+          timeout-seconds: 10
     steps:
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20

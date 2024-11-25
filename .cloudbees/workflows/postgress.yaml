@@ -17,7 +17,7 @@ jobs:
           cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7
 
-        args: ["postgres"]
+
     steps:
       - name: Run tests against postgres db
         uses: docker://postgres:13

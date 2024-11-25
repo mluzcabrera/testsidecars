@@ -6,6 +6,17 @@ on:
 
 jobs:
   build:
+    services:
+      postgres:
+        image: docker://postgres:13
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        healthcheck:
+          cmd: pg_isready -U testuser -d testdb
+          timeout-seconds: 7
+        entrypoint: docker-entrypoint.sh
 
     steps:
       - name: Run tests against postgres db

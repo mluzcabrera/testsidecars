@@ -12,9 +12,9 @@ jobs:
         env:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb1
+          POSTGRES_DB: testdb
         healthcheck:
-          cmd: pg_isready -U testuser -d testdb1
+          cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7
         entrypoint: docker-entrypoint.sh
         args:
@@ -23,8 +23,8 @@ jobs:
       - name: Run tests against postgres db
         uses: docker://postgres:13
         env:
-          DATABASE_URL: postgres://testuser:testpassword@localhost:5432/testdb1
+          DATABASE_URL: postgres://testuser:testpassword@localhost:5432/testdb
         run: |
           echo "DATABASE_URL is $DATABASE_URL"
           # Replace this with your actual test command
-          psql -h localhost -U testuser -d testdb1 -c "SELECT 'Hello, PostgreSQL!' AS greeting;"
+          psql -h localhost -U testuser -d testdb -c "SELECT 'Hello, PostgreSQL!' AS greeting;"

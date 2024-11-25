@@ -16,7 +16,8 @@ jobs:
         healthcheck:
           cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7
-
+        entrypoint: "docker-entrypointdddddddd.sh"
+        args: ["postgresddddddddddd"]
 
     steps:
       - name: Run tests against postgres db

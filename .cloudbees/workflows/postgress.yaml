@@ -12,7 +12,7 @@ jobs:
         env:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
-          POSTGRES_DB: testdb
+          POSTGRES_DB: testdb1
         healthcheck:
           cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7

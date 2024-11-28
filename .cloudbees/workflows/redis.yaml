@@ -9,11 +9,13 @@ jobs:
       redis:
         image: docker://redis:7-alpine3.20
         healthcheck:
-          cmd: "redis-cli ping"
+          cmd: |-
+            redis-cli ping
+            sleep 120
           timeout-seconds: 10
     steps:
-      - name: Run Redis commands
-        uses: docker://redis:7-alpine3.20
+      - uses: docker://redis:7-alpine3.20
+        name: Run Redis commands
         run: |
           redis-cli SET testkey "Hello Redis!"
           redis-cli GET testkey

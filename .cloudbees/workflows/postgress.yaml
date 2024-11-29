@@ -20,7 +20,7 @@ jobs:
         args: [postgres]
 
     steps:
-      - name: Run tests against postgres db
+      - name: Run tests against postgres db achange
         uses: docker://postgres:13
         env:
           DATABASE_URL: postgres://testuser:testpassword@localhost:5432/testdb

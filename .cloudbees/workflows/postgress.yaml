@@ -26,5 +26,5 @@ jobs:
           DATABASE_URL: postgres://testuser:testpassword@localhost:5432/testdb
         run: |
           echo "DATABASE_URL is $DATABASE_URL"
-          # Replace this with your actual test command
+          # Replace this with your actual test command.
           psql -h localhost -U testuser -d testdb -c "SELECT 'Hello, PostgreSQL!' AS greeting;"

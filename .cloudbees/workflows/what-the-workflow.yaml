@@ -8,9 +8,7 @@ jobs:
     services:
       aservice:
         image: redis
-        entrypoint: "docker-entrypoint.sh"
-        args: "redis-server"
-
+        entrypoint: "docker-entrypoin222t.sh"
     steps:
       - name: Say hello
         uses: docker://redis

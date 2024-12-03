@@ -14,4 +14,5 @@ jobs:
         uses: docker://golang:1.20.3-alpine3.17
         shell: sh
         run: |
-          echo "hello world"
+          redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
+          redis-cli -h localhost -p 6379 GET testkey

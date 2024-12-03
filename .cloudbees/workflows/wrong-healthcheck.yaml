@@ -13,7 +13,7 @@ jobs:
         image: redis:7-alpine3.20
         entrypoint: "docker-entrypoint.sh"
         healthcheck:
-          cmd: "redis-cli -h 192.0.1.0 ping"
+          cmd: "redis-cli ping"
           timeout-seconds: 5
     
     steps:

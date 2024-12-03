@@ -1,0 +1,24 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: healthcheck-timeout
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    services:
+      aservice:
+        image: redis
+        entrypoint: "docker-entrypoint.sh"
+
+        healthcheck:
+          cmd: |
+           sleep 10
+           redis-cli ping
+          timeout-seconds: 5
+    steps:
+      - name: Say hello
+        uses: docker://redis
+        shell: sh
+        run: |
+          redis-cli SET testkey "Hello Redis!"
+          redis-cli GET testkey

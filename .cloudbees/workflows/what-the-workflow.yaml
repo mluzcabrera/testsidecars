@@ -8,10 +8,10 @@ jobs:
     services:
       aservice:
         image: redis
-        entrypoint: "docker-entrypoint.sh"
+        entrypoint: ""
     steps:
       - name: Say hello
-        uses: docker://redis:7-alpine3.20
+        uses: docker://redis
         shell: sh
         run: |
           redis-cli SET testkey "Hello Redis!"

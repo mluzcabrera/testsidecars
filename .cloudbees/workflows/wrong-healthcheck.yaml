@@ -1,0 +1,23 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: wrong healthcheck
+on:
+  workflow_dispatch:
+permissions:
+  scm-token-own: read
+  scm-token-org: read
+  id-token: write
+jobs:
+  build:
+    services:
+      redis:
+        image: docker://redis:7-alpine3.20
+        healthcheck:
+          cmd: awrongcommand
+          timeout-seconds: 120
+    steps:
+      - name: Run Redis commands
+        uses: docker://redis:7-alpine3.20
+        run: |
+          redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
+          redis-cli -h localhost -p 6379 GET testkey

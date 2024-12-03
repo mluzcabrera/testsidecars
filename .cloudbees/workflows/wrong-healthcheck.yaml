@@ -12,6 +12,8 @@ jobs:
       redis:
         image: redis:7-alpine3.20
         entrypoint: "docker-entrypoint.sh"
+        healthcheck:
+          cmd: wroooong
     
     steps:
       # Connecting to Redis and executing commands

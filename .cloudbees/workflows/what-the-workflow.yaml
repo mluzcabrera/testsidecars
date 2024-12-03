@@ -10,9 +10,7 @@ jobs:
         image: redis
         entrypoint: "docker-entrypoint.sh"
         args: "redis-server"
-        healthcheck:
-          cmd: "redis-cli ping"
-          timeout-seconds: 5
+
     steps:
       - name: Say hello
         uses: docker://redis

@@ -12,6 +12,7 @@ jobs:
     services:
       redis:
         image: docker://redis:7-alpine3.20
+        entrypoint: caca
         healthcheck:
           cmd: awrongcommand
           timeout-seconds: 120

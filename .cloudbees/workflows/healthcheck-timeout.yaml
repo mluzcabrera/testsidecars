@@ -9,7 +9,7 @@ jobs:
       aservice:
         image: redis
         entrypoint: "docker-entrypoint.sh"
-
+        args: "redis-server"
         healthcheck:
           cmd: |
            sleep 10

@@ -17,7 +17,7 @@ jobs:
           cmd: pg_isready -U testuser -d testdb
           timeout-seconds: 7
         entrypoint: "docker-entrypoint.sh"
-        args: [postgres]
+        args: "postgres"
 
     steps:
       - name: Run tests against postgres db achange

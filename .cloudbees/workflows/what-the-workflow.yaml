@@ -5,6 +5,9 @@ on:
   workflow_dispatch:
 jobs:
   build:
+    services:
+      aservice:
+        image: redis
     steps:
       - name: Say hello
         uses: docker://golang:1.20.3-alpine3.17

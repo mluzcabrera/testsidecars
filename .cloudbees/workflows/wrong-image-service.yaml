@@ -18,7 +18,7 @@ jobs:
         entrypoint: caca
     steps:
       - name: Run Redis commands
-        uses: docker://redis:7-alpine3.20
+        uses: wrong4
         run: |
           redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
           redis-cli -h localhost -p 6379 GET testkey

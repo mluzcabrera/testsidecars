@@ -11,10 +11,10 @@ jobs:
         image: wrong
         entrypoint: caca
       redis2:
-        image: wrong
+        image: wrong2
         entrypoint: caca
       redis3:
-        image: wrong
+        image: wrong3
         entrypoint: caca
     steps:
       - name: Run Redis commands

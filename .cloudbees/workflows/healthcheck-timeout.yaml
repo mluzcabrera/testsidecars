@@ -12,9 +12,8 @@ jobs:
         args: "redis-server"
         healthcheck:
           cmd: |
-           sleep 10
            redis-cli ping
-          timeout-seconds: 5
+          timeout-seconds: 120
     steps:
       - name: Say hello
         uses: docker://redis

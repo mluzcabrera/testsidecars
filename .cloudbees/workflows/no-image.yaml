@@ -7,7 +7,6 @@ jobs:
   build:
     services:
       aservice:
-        image: 
         entrypoint: "docker-entrypoint.sh"
     steps:
       - name: Say hello

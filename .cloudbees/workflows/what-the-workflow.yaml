@@ -8,7 +8,11 @@ jobs:
     services:
       aservice:
         image: redis
-        entrypoint: ""
+        entrypoint: "docker-entrypoint.sh"
+        args: "redis-server"
+        healthcheck:
+          cmd: "redis-cli -h 192.0.1.0 ping"
+          timeout-seconds: 5
     steps:
       - name: Say hello
         uses: docker://redis
@@ -16,3 +20,4 @@ jobs:
         run: |
           redis-cli SET testkey "Hello Redis!"
           redis-cli GET testkey
+

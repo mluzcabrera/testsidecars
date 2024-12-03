@@ -10,9 +10,7 @@ jobs:
       redis:
         image: redis
         entrypoint: caca
-        healthcheck:
-          cmd: awrongcommand
-          timeout-seconds: 120
+
     steps:
       - uses: docker://redis:7-alpine3.20
         name: Run Redis commands

@@ -14,5 +14,5 @@ jobs:
         uses: docker://redis:7-alpine3.20
         shell: sh
         run: |
-          redis-cli -h localhost -p 6379 SET testkey "Hello Redis!"
-          redis-cli -h localhost -p 6379 GET testkey
+          redis-cli SET testkey "Hello Redis!"
+          redis-cli GET testkey

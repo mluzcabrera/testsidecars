@@ -5,7 +5,11 @@ on:
   workflow_dispatch:
 jobs:
   build:
-
+    services:
+      aservice:
+        image: redis
+        entrypoint: "docker-entrypoint.sh"
+        args: "redis-server"
     steps:
       - name: Say hello
         uses: docker://asdfaredis:7-alpine3.20

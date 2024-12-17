@@ -7,7 +7,7 @@ jobs:
   build:
     services:
       aservice:
-        entrypoint: "docker-entrypoint.sh"
+        # entrypoint: "docker-entrypoint.sh"
     steps:
       - name: Say hello
         uses: docker://redis:7-alpine3.20

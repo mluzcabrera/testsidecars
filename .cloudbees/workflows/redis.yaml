@@ -8,12 +8,12 @@ jobs:
     services:
       redis:
         image: docker://redis:7-alpine3.20
-        entrypoint: "docker-entrypoint.sh"
-        healthcheck:
-          cmd: |-
-            redis-cli ping
-            sleep 120
-          timeout-seconds: 10
+        # entrypoint: "docker-entrypoint.sh"
+        # healthcheck:
+          # cmd: |-
+            # redis-cli ping
+            # sleep 120
+          # timeout-seconds: 10
     steps:
       - uses: docker://redis:7-alpine3.20
         name: Run Redis commands

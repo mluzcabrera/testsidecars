@@ -32,7 +32,7 @@ jobs:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
-         args: "postgres"
+        args: "postgres"
 
     steps:
       - name: Run tests against postgres db achange
@@ -51,7 +51,7 @@ build3:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
-         args: "echo 'hello args'"
+        args: "echo 'hello args'"
 
     steps:
       - name: Run tests against postgres db achange

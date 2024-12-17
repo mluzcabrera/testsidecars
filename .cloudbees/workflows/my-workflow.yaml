@@ -11,7 +11,7 @@ jobs:
       aservice:
         image: redis
         # entrypoint: "docker-entrypoint.sh"
-        args: "redis-server"
+        args: "asdfasdfasdfadf"
     steps:
       - name: Say hello
         uses: docker://golang:1.20.3-alpine3.17

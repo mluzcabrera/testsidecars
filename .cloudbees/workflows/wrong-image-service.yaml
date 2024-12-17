@@ -9,13 +9,13 @@ jobs:
     services:
       redis:
         image: wrong
-        entrypoint: caca
+        # entrypoint: caca
       redis2:
         image: wrong2
-        entrypoint: caca
+        # entrypoint: caca
       redis3:
         image: wrong3
-        entrypoint: caca
+        # entrypoint: caca
     steps:
       - name: Run Redis commands
         uses: docker://redis:7-alpine3.20

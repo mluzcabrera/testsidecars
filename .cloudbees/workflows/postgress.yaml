@@ -43,3 +43,22 @@ jobs:
           echo "DATABASE_URL is $DATABASE_URL"
           # Replace this with your actual test command.
           psql -h localhost -U testuser -d testdb -c "SELECT 'Hello, PostgreSQL!' AS greeting;"
+build3:
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+         args: "echo 'hello args'"
+
+    steps:
+      - name: Run tests against postgres db achange
+        uses: docker://postgres:13
+        env:
+          DATABASE_URL: postgres://testuser:testpassword@localhost:5432/testdb
+        run: |
+          echo "DATABASE_URL is $DATABASE_URL"
+          # Replace this with your actual test command.
+          psql -h localhost -U testuser -d testdb -c "SELECT 'Hello, PostgreSQL!' AS greeting;"

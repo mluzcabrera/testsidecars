@@ -14,3 +14,12 @@ jobs:
         run: |
           sleep 30
           echo "hello world"
+  build2:
+    needs: build
+    steps:
+      - name: Say hello
+        uses: docker://golang:1.20.3-alpine3.17
+        shell: sh
+        run: |
+          sleep 30
+          echo "hello world"

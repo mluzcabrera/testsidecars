@@ -13,7 +13,7 @@ jobs:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
-        args: "postgres"
+        # args: "postgres"
 
     steps:
       - name: Run tests against postgres db achange

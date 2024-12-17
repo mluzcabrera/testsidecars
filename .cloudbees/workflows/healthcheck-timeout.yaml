@@ -23,3 +23,11 @@ jobs:
           sleep 30
           redis-cli SET testkey "Hello Redis!"
           redis-cli GET testkey
+  build2:
+    needs: build
+    steps:
+      - name: Say hello
+        uses: docker://redis
+        shell: sh
+        run: |
+          sleep 30

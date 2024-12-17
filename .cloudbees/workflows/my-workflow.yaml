@@ -7,6 +7,10 @@ on:
 
 jobs:
   build:
+    aservice:
+        image: redis
+        # entrypoint: "docker-entrypoint.sh"
+        args: "redis-server"
     steps:
       - name: Say hello
         uses: docker://golang:1.20.3-alpine3.17
@@ -16,6 +20,10 @@ jobs:
           echo "hello world"
   build2:
     needs: build
+    aservice:
+        image: redis
+        # entrypoint: "docker-entrypoint.sh"
+        args: "redis-server"
     steps:
       - name: Say hello
         uses: docker://golang:1.20.3-alpine3.17

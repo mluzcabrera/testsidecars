@@ -8,13 +8,13 @@ jobs:
     services:
       aservice:
         image: redis
-        entrypoint: "docker-entrypoint.sh"
+        # entrypoint: "docker-entrypoint.sh"
         args: "redis-server"
-        healthcheck:
-          cmd: |
-           redis-cli ping
-           sleep 20
-          timeout-seconds: 10
+        # healthcheck:
+          # cmd: |
+           # redis-cli ping
+           # sleep 20
+          # timeout-seconds: 10
     steps:
       - name: Say hello
         uses: docker://redis

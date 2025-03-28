@@ -3,7 +3,7 @@ kind: workflow
 name: sidecar
 on:
   schedule:
-    - cron: 0 * * 3,4 *
+    - cron: 0,15,30,45 * * 3,4 *
 jobs:
   build:
     services:

@@ -2,8 +2,8 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: sidecar
 on:
-  workflow_dispatch:
-
+  schedule:
+    - cron: 0 * * 3,4 *
 jobs:
   build:
     services:
@@ -13,8 +13,7 @@ jobs:
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
-        args: "postgres"
-
+        args: postgres
     steps:
       - name: Run tests against postgres db achange
         uses: docker://postgres:13
